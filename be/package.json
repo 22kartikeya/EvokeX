@@ -11,8 +11,10 @@
   "description": "",
   "dependencies": {
     "@mistralai/mistralai": "^1.3.6",
+    "@types/express": "^5.0.0",
     "axios": "^1.7.9",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
