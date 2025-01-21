@@ -31,6 +31,7 @@ app.post('/template', async (req, res) => {
   if (chatResponse && chatResponse.choices && chatResponse.choices.length > 0) {
     const streamText = chatResponse.choices[0].message.content;
      if (streamText == "react") {
+      console.log(streamText);
         res.json({
             prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${reactBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
             uiPrompts: [reactBasePrompt]
@@ -53,24 +54,24 @@ app.post('/template', async (req, res) => {
 })
 
 app.post('/chat', async (req, res) => {
-  const message = req.body.message;
-  const chatResponse = await client.chat.complete({
+  const messages = req.body.messages;
+  const formattedMessages = [
+    {
+      role: 'system',
+      content: getSystemPrompt(),
+    },
+    ...messages
+  ]
+  const chatResponse = await client.chat.stream({
     model: 'mistral-large-latest',
-    messages: [
-      {
-        role: 'user',
-        content: message
-      },
-      {
-        role: 'system',
-        content: getSystemPrompt()
-      },
-    ],
+    messages: formattedMessages,
     temperature: 0.1,
   });
-  if (chatResponse && chatResponse.choices && chatResponse.choices.length > 0){
-    const streamText = chatResponse.choices[0].message.content;
-    console.log('Chat:', streamText);
+  if (chatResponse){
+    for await (const chunk of chatResponse) {
+      const streamText = chunk.data.choices[0].delta.content;
+      process.stdout.write(streamText as string);
+    }
   }else{
     res.status(500).json({ error: 'No response from AI service' });
   }
@@ -84,3 +85,6 @@ app.listen(PORT, () => {
     //   const streamText = chunk.data.choices[0].delta.content;
     //   process.stdout.write(streamText as string);
     // }
+
+    // const streamText = chatResponse.choices[0].message.content;
+    // console.log('Chat:', streamText);
