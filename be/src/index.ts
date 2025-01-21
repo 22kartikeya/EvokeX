@@ -9,7 +9,7 @@ import express from 'express';
 const app = express();
 const apiKey = process.env.MISTRAL_API_KEY;
 const client = new Mistral({apiKey: apiKey});
-
+const PORT = 3000;
 app.use(express.json());
 
 app.post('/template', async (req, res) => {
@@ -26,7 +26,6 @@ app.post('/template', async (req, res) => {
         content: "Return either node or react based on what do you think this project should be. Only return a single word either 'node' or 'react'. Do not return anything extra"
       },
     ],
-    temperature: 0.1,
   });
 
   if (chatResponse && chatResponse.choices && chatResponse.choices.length > 0) {
@@ -52,8 +51,33 @@ app.post('/template', async (req, res) => {
     console.error('No choices returned in chat response');
   }
 })
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+
+app.post('/chat', async (req, res) => {
+  const message = req.body.message;
+  const chatResponse = await client.chat.complete({
+    model: 'mistral-large-latest',
+    messages: [
+      {
+        role: 'user',
+        content: message
+      },
+      {
+        role: 'system',
+        content: getSystemPrompt()
+      },
+    ],
+    temperature: 0.1,
+  });
+  if (chatResponse && chatResponse.choices && chatResponse.choices.length > 0){
+    const streamText = chatResponse.choices[0].message.content;
+    console.log('Chat:', streamText);
+  }else{
+    res.status(500).json({ error: 'No response from AI service' });
+  }
+})
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 })
 
 // for await (const chunk of chatResponse) {
