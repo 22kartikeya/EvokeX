@@ -13,13 +13,11 @@ const client = new Mistral({apiKey: apiKey});
 const PORT = 3000;
 app.use(express.json());
 
-// bottleneck limiter
 const limiter = new Bottleneck({
-  maxConcurrent: 1, // Allow 1 request at a time
-  minTime: 1000, // Wait 1000ms (1 second) between requests
+  maxConcurrent: 1,
+  minTime: 1000,
 });
 
-// Wrap the Mistral API call with Bottleneck
 const limitedChatComplete = limiter.wrap((options: any) => client.chat.complete(options));
 
 app.post('/template', async (req, res) => {
