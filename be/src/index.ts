@@ -5,6 +5,7 @@ import { getSystemPrompt } from './prompts';
 import { BASE_PROMPT } from './basePrompt';
 import {basePrompt as nodeBasePrompt} from "./support/node";
 import {basePrompt as reactBasePrompt} from "./support/react";
+import {basePrompt as nextBasePrompt} from "./support/next";
 import express from 'express';
 import Bottleneck from "bottleneck";
 const app = express();
@@ -22,7 +23,7 @@ const limitedChatComplete = limiter.wrap((options: any) => client.chat.complete(
 
 app.post('/template', async (req, res) => {
   try{
-    const prompt = req.body.prompt;
+    const { prompt } = req.body;
     const chatResponse = await limitedChatComplete({
     model: 'mistral-large-latest',
     messages: [
@@ -32,7 +33,7 @@ app.post('/template', async (req, res) => {
       },
       {
         role: 'system',
-        content: "Return either node or react based on what do you think this project should be. Only return a single word either 'node' or 'react'. Do not return anything extra"
+        content: "Return either node, react or next based on what do you think this project should be. Only return a single word either 'node', 'react' or 'next'. Do not return anything extra"
       },
       ],
     });
@@ -52,6 +53,15 @@ app.post('/template', async (req, res) => {
           res.json({
               prompts: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
               uiPrompts: [nodeBasePrompt]
+          })
+          return;
+      }
+
+      if (streamText == "next") {
+        console.log(streamText);
+          res.json({
+              prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nextBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+              uiPrompts: [nextBasePrompt]
           })
           return;
       }
