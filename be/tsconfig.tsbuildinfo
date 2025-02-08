@@ -1,1 +1,1 @@
-{"root":["./src/baseprompt.ts","./src/constants.ts","./src/index.ts","./src/prompts.ts","./src/stripindents.ts","./src/support/next.ts","./src/support/node.ts","./src/support/react.ts"],"version":"5.7.3"}
+{"root":["./src/baseprompt.ts","./src/constants.ts","./src/index.ts","./src/prompts.ts","./src/stripindents.ts","./src/routes/db/model.ts","./src/routes/userroutes/server.ts","./src/support/next.ts","./src/support/node.ts","./src/support/react.ts"],"version":"5.7.3"}
