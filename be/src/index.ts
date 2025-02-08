@@ -33,7 +33,7 @@ app.post('/template', async (req, res) => {
       },
       {
         role: 'system',
-        content: "Return either node, react or next based on what do you think this project should be. Only return a single word either 'node', 'react' or 'next'. Do not return anything extra"
+        content: "Return either 'node', 'react', or 'next' based on what you think this project should be. Only return a single word."
       },
       ],
     });
@@ -50,6 +50,7 @@ app.post('/template', async (req, res) => {
       }
 
       if (streamText === "node") {
+        console.log(streamText);
           res.json({
               prompts: [`Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nodeBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
               uiPrompts: [nodeBasePrompt]
