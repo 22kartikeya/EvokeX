@@ -33,7 +33,6 @@ export default function AppBar() {
           </svg>
         </button>
 
-        {/* Navbar Links */}
         <div className="hidden w-full md:flex md:w-auto" id="navbar-default">
           <ul className="font-medium flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8 p-4 md:p-0 bg-gray-900 md:bg-transparent border border-gray-700 md:border-0 rounded-lg md:mt-0">
             <li>
