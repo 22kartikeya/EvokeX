@@ -1,5 +1,5 @@
-import { MODIFICATIONS_TAG_NAME, WORK_DIR, allowedHTMLElements } from './constants';
-import { stripIndents } from "./stripindents";
+import { MODIFICATIONS_TAG_NAME, WORK_DIR, allowedHTMLElements } from '../config/constants';
+import { stripIndents } from '../utils/stripIndents'
 
 export const getSystemPrompt = (cwd: string = WORK_DIR) => `
 You are Bolt, an expert AI assistant and exceptional senior software developer with vast knowledge across multiple programming languages, frameworks, and best practices.
