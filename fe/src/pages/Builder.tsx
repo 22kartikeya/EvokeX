@@ -1,4 +1,4 @@
-import React from 'react';
+import {useState }from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { StepsList } from '../components/StepsList';
 import { FileExplorer } from '../components/FileExplorer';
@@ -29,11 +29,11 @@ const getFileLanguage = (fileName: string): string => {
 
 export const Builder: React.FC = () => {
   const location = useLocation();
-  const [prompt, setPrompt] = React.useState(location.state?.prompt || '');
-  const [isGenerating, setIsGenerating] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [prompt, setPrompt] = useState(location.state?.prompt || '');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [steps] = React.useState<Step[]>([
+  const [steps] = useState<Step[]>([
     {
       id: 'analyze',
       title: 'Analyzing Requirements',
@@ -66,7 +66,7 @@ export const Builder: React.FC = () => {
     }
   ]);
 
-  const [files, setFiles] = React.useState<File[]>([
+  const [files, setFiles] = useState<File[]>([
     {
       name: 'src',
       type: 'folder',
@@ -120,10 +120,10 @@ export const Builder: React.FC = () => {
     }
   ]);
 
-  const [tabs, setTabs] = React.useState<TabData[]>([]);
-  const [activeTab, setActiveTab] = React.useState<string | null>(null);
-  const [activeView, setActiveView] = React.useState<'code' | 'preview'>('code');
-  const [isViewTransitioning, setIsViewTransitioning] = React.useState(false);
+  const [tabs, setTabs] = useState<TabData[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<'code' | 'preview'>('code');
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
   const toggleFolder = (path: string[]) => {
     const updateFiles = (files: File[], currentPath: string[]): File[] => {
