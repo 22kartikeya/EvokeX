@@ -16,7 +16,7 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-10 px-4 py-2", // Normal size button
-        sm: "h-10 rounded-xl px-2", // Small size button
+        sm: "h-8 rounded-xl px-3", // Small size button
         lg: "h-11 rounded-xl px-8", // Large size button
         icon: "h-10 w-10", // Icon size button
       },
