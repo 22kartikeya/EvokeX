@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXing } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "../ui/Button"
-import { Github } from "lucide-react";
+import { Github, Sun, Moon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect} from "react";
 import axios from "axios";
@@ -33,16 +33,29 @@ export const AppBar: React.FC = () => {
     console.log(githubid);
   }
 
-      if(githubid != undefined){
+  const [theme, setTheme] = useState("light");
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
+      if(githubid == undefined){
         return (
           <header className="fixed top-0 left-0 right-0 flex items-center justify-between p-2 backdrop-blur-md bg-background/50 border-b border-white/10 z-50">
-        <div className="flex items-center ml-4 space-x-4">
-          <FontAwesomeIcon icon={faXing} className="w-8 h-7" />
-          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent animate-type-slide-in">
-            EvokeX
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
+            <div className="flex items-center ml-4 space-x-4">
+            <FontAwesomeIcon icon={faXing} className="w-8 h-7" />
+            <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent animate-type-slide-in">
+              EvokeX
+            </Link>
+            </div>
+            <div className="flex items-center gap-4 mr-4">
+        <div className="flex items-center md:order-2 space-x-3 md:space-x-0">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full bg-gray-200 dark:bg-gray-800"
+            >
+            {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+          </button>
           <Button variant="ghost" size="sm" className="text-sm" 
           onClick={loginHandler}>
             <Github className="w-4 h-4 mr-2" />
@@ -55,7 +68,8 @@ export const AppBar: React.FC = () => {
           >
             Get Started
           </Button>
-        </div>
+          </div>
+          </div>
       </header>
       )
     }else{
@@ -67,6 +81,9 @@ export const AppBar: React.FC = () => {
           EvokeX
         </Link>
       </div>
+
+
+
       <div className="flex items-center gap-4 mr-4">
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0">
           <button 

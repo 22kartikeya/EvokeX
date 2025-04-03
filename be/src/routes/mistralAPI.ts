@@ -91,6 +91,7 @@ router.post('/chat', async (req, res) => {
       model: 'mistral-large-latest',
       messages: formattedMessages,
       temperature: 0.1,
+      tokenLimit: 10000
     });
 
     if (chatResponse && chatResponse.choices && chatResponse.choices.length > 0) {
