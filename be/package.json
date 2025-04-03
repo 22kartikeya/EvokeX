@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^0.7.0",
     "@mistralai/mistralai": "^1.3.6",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",

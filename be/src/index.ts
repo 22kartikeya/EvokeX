@@ -9,6 +9,7 @@ import MongoStore from "connect-mongo";
 // Import authentication and API routes
 import authRoutes from "./routes/auth"
 import mistralRoutes from "./routes/mistralAPI";
+import geminiRoutes from "./routes/geminiAPI";
 
 dotenv.config();
 
@@ -34,9 +35,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use authentication and Mistral API routes
-app.use("/auth", authRoutes);  // Routes from auth.ts
-app.use("/mistral", mistralRoutes);  // Routes from mistralAPI.ts
+// Use authentication
+app.use("/auth", authRoutes);
+app.use("/mistral", mistralRoutes);
+app.use("/gemini", geminiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
