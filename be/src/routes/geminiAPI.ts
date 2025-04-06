@@ -93,7 +93,7 @@ router.post('/chat', async (req, res) => {
     });
 
     if (chatResponse?.candidates?.length && chatResponse.candidates.length > 0) {
-      const streamText = chatResponse.candidates[0]?.content?.parts?.[0]?.text?.trim().toLowerCase();
+      const streamText = chatResponse.candidates[0]?.content?.parts?.[0]?.text?.trim();
       console.log('Chat:', streamText);
       res.json({ response: streamText });
     } else {
