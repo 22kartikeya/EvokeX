@@ -10,7 +10,6 @@ import MongoStore from "connect-mongo";
 import authRoutes from "./routes/auth"
 import mistralRoutes from "./routes/mistralAPI";
 import geminiRoutes from "./routes/geminiAPI";
-
 dotenv.config();
 
 const app = express();
@@ -35,7 +34,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use authentication
+// Use authentication and api routes
 app.use("/auth", authRoutes);
 app.use("/mistral", mistralRoutes);
 app.use("/gemini", geminiRoutes);
