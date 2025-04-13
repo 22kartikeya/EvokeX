@@ -14,6 +14,7 @@ export function PreviewFrame({ webContainer }: PreviewFrameProps) {
   const bootingRef = useRef(false); // 🔒 prevent duplicate boots
 
   async function bootAndRunDevServer(retry = false) {
+    
     if (bootingRef.current) return;
     bootingRef.current = true;
     setLoading(true);

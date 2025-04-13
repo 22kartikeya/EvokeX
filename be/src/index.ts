@@ -21,7 +21,10 @@ mongoose.connect(process.env.MONGO_URI as string)
   .catch(err => console.log("MongoDB Connection Error:", err));
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true
+}));
 
 // Session setup (stored in MongoDB)
 app.use(session({

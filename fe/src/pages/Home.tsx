@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Button } from "../ui/Button"
 import { Textarea } from "../ui/Textarea"
 import { useNavigate } from 'react-router-dom';
-import { AppBar } from '@/components/AppBar';
 import { GradientOrbs } from '@/components/GradientOrbs';
 import { QuickActions } from '@/sections/QuickActions';
 import { Footer } from '@/components/Footer';
@@ -25,7 +24,6 @@ export const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background relative overflow-hidden">
 
       <GradientOrbs/>
-      <AppBar/>
 
       {/* Main Content */}
       <main className="w-full px-4 pt-32 pb-16 flex flex-col items-center text-center relative">
