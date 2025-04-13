@@ -1,8 +1,21 @@
+export enum StepType{
+  CreateFile,
+  CreateFolder,
+  EditFile,
+  DeleteFile,
+  RunScript
+}
+
+
+// Todo change path available types
 export interface Step {
-  id: string;
+  id: number;
   title: string;
   description: string;
+  type: StepType;
   status: 'pending' | 'in-progress' | 'completed';
+  code?: string;
+  path?: string; // path is not needed when StepType is of type RunScript
 }
 
 export interface File {
@@ -10,6 +23,7 @@ export interface File {
   type: 'file' | 'folder';
   content?: string;
   children?: File[];
+  path: string;
   isOpen?: boolean;
 }
 

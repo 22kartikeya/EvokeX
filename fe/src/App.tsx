@@ -1,9 +1,10 @@
+/* eslint-disable no-useless-escape */
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { Builder } from './pages/Builder';
 
-function App() {
+function App() { 
   return (
     <BrowserRouter>
       <Routes>

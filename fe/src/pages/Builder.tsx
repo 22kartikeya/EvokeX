@@ -1,11 +1,14 @@
-import {useState }from 'react';
+import {useEffect, useState }from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { StepsList } from '../components/StepsList';
 import { FileExplorer } from '../components/FileExplorer';
 import { CodeEditor } from '../components/CodeEditor';
 import { Preview } from '../components/Preview';
 import { Loader } from 'lucide-react';
-import type { Step, File, TabData } from '../types';
+import { Step, File, TabData, StepType} from '../types';
+import axios from 'axios';
+import { BACKEND_URL } from '../config';
+import { parseXml } from '@/steps';
 
 const getFileLanguage = (fileName: string): string => {
   const ext = fileName.split('.').pop()?.toLowerCase();
@@ -32,9 +35,14 @@ export const Builder: React.FC = () => {
   const [prompt, setPrompt] = useState(location.state?.prompt || '');
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tabs, setTabs] = useState<TabData[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [activeView, setActiveView] = useState<'code' | 'preview'>('code');
+  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
 
-  const [steps] = useState<Step[]>([
-    {
+
+  // structure for steps:
+  /* {
       id: 'analyze',
       title: 'Analyzing Requirements',
       description: 'Processing your request and planning the website structure',
@@ -64,66 +72,169 @@ export const Builder: React.FC = () => {
       description: 'Finalizing configurations and optimizations',
       status: 'pending'
     }
-  ]);
+    */
+
+  const [steps, setSteps] = useState<Step[]>([]);
 
   const [files, setFiles] = useState<File[]>([
-    {
-      name: 'src',
-      type: 'folder',
-      isOpen: true,
-      children: [
-        {
-          name: 'components',
-          type: 'folder',
-          isOpen: false,
-          children: [
-            {
-              name: 'Header.tsx',
-              type: 'file',
-              content: 'export const Header = () => {\n  return <div>Header</div>;\n};'
-            },
-            {
-              name: 'Footer.tsx',
-              type: 'file',
-              content: 'export const Footer = () => {\n  return <div>Footer</div>;\n};'
-            }
-          ]
-        },
-        {
-          name: 'App.tsx',
-          type: 'file',
-          content: 'function App() {\n  return <div>Hello World</div>;\n}\n\nexport default App;'
-        },
-        {
-          name: 'index.tsx',
-          type: 'file',
-          content: 'import React from "react";\nimport ReactDOM from "react-dom";\nimport App from "./App";\n\nReactDOM.render(<App />, document.getElementById("root"));'
-        }
-      ]
-    },
-    {
-      name: 'public',
-      type: 'folder',
-      isOpen: false,
-      children: [
-        {
-          name: 'index.html',
-          type: 'file',
-          content: '<!DOCTYPE html>\n<html>\n  <head>\n    <title>My App</title>\n  </head>\n  <body>\n    <div id="root"></div>\n  </body>\n</html>'
-        }
-      ]
-    },
-    {
-      name: 'package.json',
-      type: 'file',
-      content: '{\n  "name": "my-app",\n  "version": "1.0.0"\n}'
-    }
+    // {
+    //   name: 'src',
+    //   type: 'folder',
+    //   path: '/src',
+    //   isOpen: true,
+    //   children: [
+    //     {
+    //       name: 'components',
+    //       type: 'folder',
+    //       path: '/src/components',
+    //       isOpen: false,
+    //       children: [
+    //         {
+    //           name: 'Header.tsx',
+    //           type: 'file',
+    //           path: '/src/components/Header.tsx',
+    //           content: 'export const Header = () => {\n  return <div>Header</div>;\n};'
+    //         },
+    //         {
+    //           name: 'Footer.tsx',
+    //           type: 'file',
+    //           path: '/src/components/Footer.tsx',
+    //           content: 'export const Footer = () => {\n  return <div>Footer</div>;\n};'
+    //         }
+    //       ]
+    //     },
+    //     {
+    //       name: 'App.tsx',
+    //       type: 'file',
+    //       path: '/src/App.tsx',
+    //       content: 'function App() {\n  return <div>Hello World</div>;\n}\n\nexport default App;'
+    //     },
+    //     {
+    //       name: 'index.tsx',
+    //       type: 'file',
+    //       path: '/src/index.tsx',
+    //       content: 'import React from "react";\nimport ReactDOM from "react-dom";\nimport App from "./App";\n\nReactDOM.render(<App />, document.getElementById("root"));'
+    //     }
+    //   ]
+    // },
+    // {
+    //   name: 'public',
+    //   type: 'folder',
+    //   path: '/public',
+    //   isOpen: false,
+    //   children: [
+    //     {
+    //       name: 'index.html',
+    //       type: 'file',
+    //       path: '/public/index.html',
+    //       content: '<!DOCTYPE html>\n<html>\n  <head>\n    <title>My App</title>\n  </head>\n  <body>\n    <div id="root"></div>\n  </body>\n</html>'
+    //     }
+    //   ]
+    // },
+    // {
+    //   name: 'package.json',
+    //   type: 'file',
+    //   path: '/package.json',
+    //   content: '{\n  "name": "my-app",\n  "version": "1.0.0"\n}'
+    // }
   ]);
 
-  const [tabs, setTabs] = useState<TabData[]>([]);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<'code' | 'preview'>('code');
-  const [isViewTransitioning, setIsViewTransitioning] = useState(false);
+  // ugly file structure need to be improved and also optimised
+  // everytime steps or files changes it will run
+  useEffect(() => {
+    let originalFiles = [...files];
+    let updateHappened = false;
+    steps.filter(({status}) => status === "pending").map(step => {
+      updateHappened = true;
+      if (step?.type === StepType.CreateFile) {
+        let parsedPath = step.path?.split("/") ?? []; // ["src", "components", "App.tsx"]
+        let currentFileStructure = [...originalFiles]; // {}
+        let finalAnswerRef = currentFileStructure;
+  
+        let currentFolder = ""
+        while(parsedPath.length) {
+          currentFolder =  `${currentFolder}/${parsedPath[0]}`;
+          let currentFolderName = parsedPath[0];
+          parsedPath = parsedPath.slice(1);
+  
+          if (!parsedPath.length) {
+            // final file
+            let file = currentFileStructure.find(x => x.path === currentFolder)
+            if (!file) {
+              currentFileStructure.push({
+                name: currentFolderName,
+                type: 'file',
+                path: currentFolder,
+                content: step.code
+              })
+            } else {
+              file.content = step.code;
+            }
+          } else {
+            /// in a folder
+            let folder = currentFileStructure.find(x => x.path === currentFolder)
+            if (!folder) {
+              // create the folder
+              currentFileStructure.push({
+                name: currentFolderName,
+                type: 'folder',
+                path: currentFolder,
+                children: []
+              })
+            }
+  
+            currentFileStructure = currentFileStructure.find(x => x.path === currentFolder)!.children!;
+          }
+        }
+        originalFiles = finalAnswerRef;
+      }
+
+    })
+
+    if (updateHappened) {
+
+      setFiles(originalFiles)
+      setSteps(steps => steps.map((s: Step) => {
+        return {
+          ...s,
+          status: "completed"
+        }
+        
+      }))
+    }
+    console.log(files);
+  }, [steps, files]);
+
+  async function init(){
+    const response = await axios.post(`${BACKEND_URL}/mistral/template`, {
+      prompt: prompt.trim()
+    });
+    const { prompts, uiPrompts } = response.data as {
+      prompts?: string[];
+      uiPrompts?: string[];
+    }; 
+
+    setSteps(parseXml(uiPrompts[0]).map((x: Step) => ({
+      ...x,
+      status: "pending"
+    })));
+
+    const stepsResponse = await axios.post(`${BACKEND_URL}/mistral/chat`, {
+      messages: [...prompts, prompt].map(content => ({
+        role: "user",
+        content
+      }))
+    })
+
+    setSteps((s) => [...s, ...parseXml(stepsResponse.data.response).map(x => ({
+      ...x,
+      status: "pending" as const
+    }))]);
+  }
+
+  useEffect(() => {
+    init();
+  },[])
 
   const toggleFolder = (path: string[]) => {
     const updateFiles = (files: File[], currentPath: string[]): File[] => {
