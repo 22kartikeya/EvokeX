@@ -13,6 +13,8 @@
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@monaco-editor/react": "^4.6.0",
+    "@mui/material": "^7.0.2",
+    "@webcontainer/api": "^1.5.3",
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "classnames": "^2.5.1",
