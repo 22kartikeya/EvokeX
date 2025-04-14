@@ -3,19 +3,28 @@ import { faXing } from "@fortawesome/free-brands-svg-icons";
 import { Button } from "../ui/Button";
 import { Github } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { BACKEND_URL } from "@/config";
 
-export const AppBar: React.FC = () => {
-  const [user, setUser] = useState<{
+interface AppBarProps {
+  user: {
     username: string;
     name?: string;
     avatar?: string;
     email?: string;
-  } | null>(null);
+  } | null;
+  setUser: React.Dispatch<React.SetStateAction<{
+    username: string;
+    name?: string;
+    avatar?: string;
+    email?: string;
+  } | null>>;
+}
+
+export const AppBar: React.FC<AppBarProps> = ({ user, setUser }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
