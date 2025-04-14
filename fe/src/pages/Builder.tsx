@@ -459,7 +459,7 @@ export const Builder: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background">
+    <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background mt-11">
       {/* Top Bar with fixed height */}
       <div className="h-16 flex items-center justify-between px-4 border-b border-gray-700 bg-gray-800 z-10">
         <h1 className="text-xl font-semibold text-white">Project Builder</h1>

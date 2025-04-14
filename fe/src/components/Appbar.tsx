@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { BACKEND_URL } from "@/config";
 
 export const AppBar: React.FC = () => {
   const [user, setUser] = useState<{
@@ -15,20 +17,14 @@ export const AppBar: React.FC = () => {
     email?: string;
   } | null>(null);
   const navigate = useNavigate();
-  
-  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/auth/user", {
+        const res = await axios.get(`${BACKEND_URL}/auth/user`, {
           withCredentials: true,
         });
-        setUser(res.data as { username: string; name?: string; avatar?: string; email?: string; });
+        setUser(res.data);
       } catch (err) {
         console.log(`Not logged in : ${err}`);
         setUser(null);
@@ -39,12 +35,12 @@ export const AppBar: React.FC = () => {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:3000/auth/github";
+    window.location.href = `${BACKEND_URL}/auth/github`;
   };
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:3000/auth/logout", {
+      await axios.get(`${BACKEND_URL}/auth/logout`, {
         withCredentials: true,
       });
       setUser(null);
@@ -82,59 +78,45 @@ export const AppBar: React.FC = () => {
             </>
           ) : (
             <>
-              <button
-                type="button"
-                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                onClick={toggleDropdown}
+              <Menu as="div" className="relative ml-3">
+              <div>
+                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                  <span className="absolute -inset-1.5" />
+                  <span className="sr-only">Open user menu</span>
+                  <img
+                    alt="user avatar"
+                    src={user.avatar || "https://github.com/identicons/github.png"}
+                    className="size-8 rounded-full"
+                  />
+                </MenuButton>
+              </div>
+              <MenuItems
+                transition
+                className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
               >
-                <span className="sr-only">Open user menu</span>
-                <img
-                  className="w-6 h-6 rounded-full"
-                  src={user.avatar || "https://github.com/identicons/github.png"}
-                  alt="user avatar"
-                />
-              </button>
-
-              <div
-                className={`z-50 ${
-                  dropdownOpen ? "" : "hidden"
-                } text-base list-none bg-blue-950 divide-y divide-gray-100 rounded-lg shadow-sm dark:bg-gray-700 dark:divide-gray-600`}
-              >
-                <div className="px-4 py-3">
-                  <span className="block text-sm text-gray-900 dark:text-white">
+                <MenuItem>
+                  <span className="block px-4 py-2 text-lg font-semibold text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none">
                     {user.name || user.username}
                   </span>
-                  <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                    {user.email || "Not Available"}
-                  </span>
-                </div>
-                <ul className="py-2">
-                  <li>
-                    <Link
-                      to="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Dashboard
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Settings
-                    </Link>
-                  </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                    >
-                      Sign out
-                    </button>
-                  </li>
-                </ul>
-              </div>
+                </MenuItem>
+                <MenuItem>
+                  <a
+                    href="#"
+                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  >
+                    Settings
+                  </a>
+                </MenuItem>
+                <MenuItem>
+                  <a
+                    onClick={handleLogout}
+                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                  >
+                    Sign out
+                  </a>
+                </MenuItem>
+              </MenuItems>
+            </Menu>
             </>
           )}
         </div>
