@@ -29,7 +29,7 @@ export const StepsList: React.FC<StepsListProps> = ({ steps, currentStep }) => {
           <div
             key={step.id}
             className={`flex items-start gap-3 p-3 rounded-lg mb-2 ${
-              currentStep === step.id ? 'bg-gray-700' : ''
+              currentStep === String(step.id) ? 'bg-gray-700' : ''
             }`}
           >
             {getStepIcon(step.status)}

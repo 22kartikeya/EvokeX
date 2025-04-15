@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/genai": "^0.7.0",
     "@mistralai/mistralai": "^1.3.6",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
@@ -27,6 +28,7 @@
     "passport-github2": "^0.1.12"
   },
   "devDependencies": {
+    "@types/connect-mongo": "^3.1.2",
     "@types/dotenv": "^6.1.1",
     "@types/express-session": "^1.18.1",
     "@types/mongoose": "^5.11.96",
