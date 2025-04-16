@@ -80,7 +80,7 @@ router.post('/template', async (req, res) => {
       if (streamText === "next") {
         console.log(streamText);
         res.json({
-          prompts: [BASE_PROMPT, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nextBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
+          prompts: [`For all designs I ask you to make, have them be beautiful, not cookie cutter. Make webpages that are fully featured and worthy for production.\n\nWhen using client-side hooks (useState and useEffect) in a component that's being treated as a Server Component by Next.js, use only Next.js version 12 only then always add the \"use client\" directive at the top of the file.\n\nDo not write code that will trigger this error: \"Warning: Extra attributes from the server: %s%s\"\"class,style\"\n\nBy default, this template supports JSX syntax with Tailwind CSS classes, the shadcn/ui library, React hooks, and Lucide React for icons. Do not install other packages for UI themes, icons, etc unless absolutely necessary or I request them.\n\nUse icons from lucide-react for logos.\n\nUse stock photos from unsplash where appropriate, only valid URLs you know exist.\n`, `Here is an artifact that contains all files of the project visible to you.\nConsider the contents of ALL files in the project.\n\n${nextBasePrompt}\n\nHere is a list of files that exist on the file system but are not being shown to you:\n\n  - .gitignore\n  - package-lock.json\n`],
           uiPrompts: [nextBasePrompt]
         });
         return;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles, ChevronRight, X, Github } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "../ui/Button";
 import { Textarea } from "../ui/Textarea";
@@ -9,6 +9,7 @@ import { QuickActions } from '@/sections/QuickActions';
 import { Footer } from '@/components/Footer';
 import { EvokeX } from '@/sections/EvokeX';
 import { TechStack } from '@/sections/TechStack';
+
 
 interface HomeProps {
   user: {
@@ -98,12 +99,21 @@ export const Home: React.FC<HomeProps> = ({ user }) => {
 
       {/* Show the overlay when the user is not logged in */}
       {showLoginOverlay && !user && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg">
-            <h2 className="text-2xl font-bold">Please sign in to continue</h2>
-            <Button onClick={() => window.location.href = "http://localhost:3000/auth/github"} className="mt-4 bg-gradient-to-r from-purple-500 to-blue-500">
-              Sign in with GitHub
-            </Button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-none flex justify-center items-center z-50">
+          <div className="relative bg-black p-8 rounded-xl w-full max-w-md">
+            {/* Close button */}
+            <button
+              onClick={() => setShowLoginOverlay(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h2 className="text-2xl font-bold text-center">Please sign in to continue</h2>
+            <Button variant="ghost" size="sm" className="text-sm bg-black" onClick={() => navigate('/auth/github')}>
+                <Github className="w-4 h-4 mr-2" />
+                Sign in with GitHub
+              </Button>
           </div>
         </div>
       )}

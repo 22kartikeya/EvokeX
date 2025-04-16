@@ -20,7 +20,6 @@ function App() {
       <AppBar user={user} setUser={setUser} />
 
       <Routes>
-        {/* Pass user state to Home */}
         <Route path="/" element={<Home user={user} />} />
         <Route path="/builder" element={<Builder />} />
       </Routes>

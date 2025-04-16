@@ -4,7 +4,7 @@ import { StepsList } from '../components/StepsList';
 import { FileExplorer } from '../components/FileExplorer';
 import { CodeEditor } from '../components/CodeEditor';
 import { PreviewFrame } from '../components/PreviewFrame';
-import { Loader, Download, ChevronRight, MessageSquare, X, Minimize, Maximize } from 'lucide-react';
+import { Loader, Download, ChevronRight, Minimize, Maximize } from 'lucide-react';
 import { Step, File, TabData, StepType } from '../types';
 import axios from 'axios';
 import { BACKEND_URL } from '../config';
@@ -13,7 +13,6 @@ import { useWebContainer } from '@/hooks/useWebContainer';
 import { GradientOrbs } from '@/components/GradientOrbs';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { Resizable } from 're-resizable';
 import { Button } from '../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -61,11 +60,8 @@ export const Builder: React.FC = () => {
   const [steps, setSteps] = useState<Step[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const [hasSubmittedPrompt, setHasSubmittedPrompt] = useState(!!location.state?.prompt);
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatMinimized, setChatMinimized] = useState(false);
-  const [leftPanelWidth, setLeftPanelWidth] = useState('25%');
-  const [rightPanelWidth, setRightPanelWidth] = useState('75%');
-  const [editorWidth, setEditorWidth] = useState('50%');
   const webcontainer = useWebContainer();
 
   // Scroll to bottom of chat on new messages
@@ -133,8 +129,13 @@ export const Builder: React.FC = () => {
           status: "completed"
         }
       }));
+      
+      // Auto-show chat after initial steps are completed
+      if (!showChat) {
+        setShowChat(true);
+      }
     }
-  }, [steps, files]);
+  }, [steps, files, showChat]);
 
   useEffect(() => {
     const createMountStructure = (files: File[]): Record<string, any> => {
@@ -230,13 +231,11 @@ export const Builder: React.FC = () => {
     }
   }
 
-  // due to this backend call is done many times
-  // this should have a dependency array to control the effect
   useEffect(() => {
-    if (prompt) {
+    if (prompt && !templateSet) {
       init();
     }
-  }, []);
+  }, [prompt, templateSet]);
 
   const toggleFolder = (path: string[]) => {
     const updateFiles = (files: File[], currentPath: string[]): File[] => {
@@ -370,7 +369,7 @@ export const Builder: React.FC = () => {
         ...prev,
         {
           role: "system",
-          content: stepsResponse.data.response,
+          content: "Your desired code has been added to the file",
           timestamp: new Date()
         }
       ]);
@@ -442,10 +441,6 @@ export const Builder: React.FC = () => {
     }
   };
 
-  const toggleChatPanel = () => {
-    setShowChat(!showChat);
-  };
-
   const toggleChatMinimize = () => {
     setChatMinimized(!chatMinimized);
   };
@@ -459,55 +454,22 @@ export const Builder: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background mt-11">
-      {/* Top Bar with fixed height */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-gray-700 bg-gray-800 z-10">
-        <h1 className="text-xl font-semibold text-white">Project Builder</h1>
-        <div className="flex gap-2">
-          <Button 
-            onClick={downloadProject}
-            variant="outline"
-            className="flex items-center gap-2 px-3 py-2 text-sm"
-          >
-            <Download className="w-4 h-4" />
-            Download ZIP
-          </Button>
-          <Button
-            onClick={toggleChatPanel}
-            variant={showChat ? "default" : "outline"}
-            className="flex items-center gap-2 px-3 py-2 text-sm"
-          >
-            <MessageSquare className="w-4 h-4" />
-            {showChat ? "Hide Chat" : "Show Chat"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Main content area - fills remaining height */}
+    <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background pt-12">
+      <GradientOrbs />
       <div className="flex flex-1 overflow-hidden">
-        {/* Left panel */}
-        <Resizable
-          size={{ width: leftPanelWidth, height: '100%' }}
-          onResizeStop={(e, direction, ref, d) => {
-            const newWidth = `calc(${leftPanelWidth} + ${d.width}px)`;
-            setLeftPanelWidth(newWidth);
-            setRightPanelWidth(`calc(100% - ${newWidth})`);
-          }}
-          enable={{ right: true }}
-          minWidth="15%"
-          maxWidth="40%"
-          className="flex h-full border-r border-gray-700"
-        >
-          <div className="w-1/2 border-r border-gray-700 overflow-hidden flex flex-col">
-            <div className="p-3 border-b border-gray-700 bg-gray-800">
+        <div className="w-64 flex flex-col border-r border-gray-700">
+          <div className="h-1/2 border-b border-gray-700 overflow-hidden flex flex-col">
+            <div className="p-3 border-b border-gray-700">
               <h3 className="font-medium text-white text-sm">Steps</h3>
             </div>
             <div className="overflow-auto flex-1">
               <StepsList steps={steps} currentStep="structure" />
             </div>
           </div>
-          <div className="w-1/2 overflow-hidden flex flex-col">
-            <div className="p-3 border-b border-gray-700 bg-gray-800">
+          
+          {/* Files Section */}
+          <div className="h-1/2 overflow-hidden flex flex-col">
+            <div className="p-3 border-b border-gray-700">
               <h3 className="font-medium text-white text-sm">Files</h3>
             </div>
             <div className="overflow-auto flex-1">
@@ -518,162 +480,155 @@ export const Builder: React.FC = () => {
               />
             </div>
           </div>
-        </Resizable>
+        </div>
 
-        {/* Right panel */}
-        <div className={`${rightPanelWidth} flex flex-col overflow-hidden`}>
-          <div className="flex flex-1 overflow-hidden">
-            {/* Code/Preview panel */}
-            <Resizable
-              size={{ width: editorWidth, height: '100%' }}
-              onResizeStop={(e, direction, ref, d) => {
-                setEditorWidth(`calc(${editorWidth} + ${d.width}px)`);
-              }}
-              enable={{ right: true }}
-              minWidth="30%"
-              maxWidth="95%"
-              className="flex flex-col overflow-hidden"
+        {/* Middle panel - Chat (appears after steps are completed) */}
+        <AnimatePresence>
+          {showChat && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: chatMinimized ? '48px' : '300px', opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="border-r border-gray-700 bg-gray-900 flex flex-col overflow-hidden"
             >
-              <div className="flex border-b border-gray-700 bg-gray-800">
-                <button
-                  className={`px-6 py-3 text-sm font-medium transition-all duration-200 ${
-                    activeView === 'code'
-                      ? 'text-white bg-gray-900 border-b-2 border-blue-500'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                  onClick={() => handleViewChange('code')}
-                  disabled={isViewTransitioning}
-                >
-                  Code
-                </button>
-                <button
-                  className={`px-6 py-3 text-sm font-medium transition-all duration-200 ${
-                    activeView === 'preview'
-                      ? 'text-white bg-gray-900 border-b-2 border-blue-500'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                  onClick={() => handleViewChange('preview')}
-                  disabled={isViewTransitioning}
-                >
-                  Preview
-                </button>
-              </div>
-              <div className="flex-1 relative overflow-hidden">
-                <div
-                  className={`absolute inset-0 transition-opacity duration-300 ${
-                    activeView === 'code' ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <CodeEditor
-                    tabs={tabs}
-                    activeTab={activeTab}
-                    onTabClose={handleTabClose}
-                    onTabSelect={setActiveTab}
-                    onContentChange={handleContentChange}
-                  />
-                </div>
-                <div
-                  className={`absolute inset-0 transition-opacity duration-300 ${
-                    activeView === 'preview' ? 'opacity-100 z-10' : 'opacity-0 z-0'
-                  }`}
-                >
-                  <PreviewFrame
-                    webContainer={webcontainer} files={files}
-                  />
+              <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800">
+                {!chatMinimized && <h3 className="font-medium text-white text-sm">Assistant Chat</h3>}
+                <div className="flex gap-2">
+                  <button 
+                    onClick={toggleChatMinimize} 
+                    className="p-1 text-gray-400 hover:text-white"
+                  >
+                    {chatMinimized ? <Maximize className="w-4 h-4" /> : <Minimize className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
-            </Resizable>
-            
-            {/* Chat Panel */}
-            <AnimatePresence>
-              {showChat && (
-                <motion.div
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: chatMinimized ? '48px' : '50%', opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="border-l border-gray-700 bg-gray-900 flex flex-col overflow-hidden"
-                >
-                  <div className="flex items-center justify-between p-3 border-b border-gray-700 bg-gray-800">
-                    {!chatMinimized && <h3 className="font-medium text-white text-sm">Assistant Chat</h3>}
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={toggleChatMinimize} 
-                        className="p-1 text-gray-400 hover:text-white"
-                      >
-                        {chatMinimized ? <Maximize className="w-4 h-4" /> : <Minimize className="w-4 h-4" />}
-                      </button>
-                      {!chatMinimized && (
-                        <button 
-                          onClick={toggleChatPanel} 
-                          className="p-1 text-gray-400 hover:text-white"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+              
+              {!chatMinimized && (
+                <>
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    {chatMessages.map((msg, index) => (
+                      <div key={index} className={cn(
+                        "flex gap-3 max-w-full",
+                        msg.role === "user" ? "justify-end" : "justify-start"
+                      )}>
+                        {msg.role === "system" && (
+                          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-xs font-bold">AI</span>
+                          </div>
+                        )}
+                        <div className={cn(
+                          "rounded-lg p-3 max-w-[80%]",
+                          msg.role === "user" 
+                            ? "bg-blue-600 text-white" 
+                            : "bg-gray-800 text-gray-100"
+                        )}>
+                          <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
+                          <p className="text-xs mt-1 opacity-70 text-right">{formatTime(msg.timestamp)}</p>
+                        </div>
+                        {msg.role === "user" && (
+                          <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-xs font-bold">You</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    <div ref={chatEndRef} />
                   </div>
                   
-                  {!chatMinimized && (
-                    <>
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {chatMessages.map((msg, index) => (
-                          <div key={index} className={cn(
-                            "flex gap-3 max-w-full",
-                            msg.role === "user" ? "justify-end" : "justify-start"
-                          )}>
-                            {msg.role === "system" && (
-                              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                                <span className="text-white text-xs font-bold">AI</span>
-                              </div>
-                            )}
-                            <div className={cn(
-                              "rounded-lg p-3 max-w-[80%]",
-                              msg.role === "user" 
-                                ? "bg-blue-600 text-white" 
-                                : "bg-gray-800 text-gray-100"
-                            )}>
-                              <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
-                              <p className="text-xs mt-1 opacity-70 text-right">{formatTime(msg.timestamp)}</p>
-                            </div>
-                            {msg.role === "user" && (
-                              <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                                <span className="text-white text-xs font-bold">You</span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                        <div ref={chatEndRef} />
-                      </div>
-                      
-                      <div className="p-3 border-t border-gray-700 bg-gray-800">
-                        <form onSubmit={handlePromptSubmit} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={prompt}
-                            onChange={(e) => setPrompt(e.target.value)}
-                            placeholder="Ask me anything about the project..."
-                            className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
-                            disabled={isGenerating}
-                          />
-                          <Button
-                            type="submit"
-                            className="p-2"
-                            disabled={isGenerating || !prompt.trim()}
-                          >
-                            {isGenerating ? (
-                              <Loader className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </form>
-                      </div>
-                    </>
-                  )}
-                </motion.div>
+                  <div className="p-3 border-t border-gray-700 bg-gray-800">
+                    <form onSubmit={handlePromptSubmit} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}
+                        placeholder="Ask about the project..."
+                        className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                        disabled={isGenerating}
+                      />
+                      <Button
+                        type="submit"
+                        className="p-2"
+                        disabled={isGenerating || !prompt.trim()}
+                      >
+                        {isGenerating ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                </>
               )}
-            </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Right panel - Code Editor and Preview */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Code/Preview Tabs */}
+          <div className="flex border-b border-gray-700 bg-gray-800">
+            <button
+              className={`px-6 py-3 text-sm font-medium transition-all duration-200 ${
+                activeView === 'code'
+                  ? 'text-white bg-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => handleViewChange('code')}
+              disabled={isViewTransitioning}
+            >
+              Code
+            </button>
+            <button
+              className={`px-6 py-3 text-sm font-medium transition-all duration-200 ${
+                activeView === 'preview'
+                  ? 'text-white bg-gray-900 border-b-2 border-blue-500'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+              onClick={() => handleViewChange('preview')}
+              disabled={isViewTransitioning}
+            >
+              Preview
+            </button>
+            <div className="w-full flex justify-end">
+  <Button 
+    onClick={downloadProject}
+    variant="secondary"
+    size="sm"
+    className="px-6 py-5 text-sm font-medium transition-all duration-200 gap-2 text-gray-400 hover:text-white"
+  >
+    <Download className="w-4 h-4" />
+    Download ZIP
+  </Button>
+</div>
+          </div>
+          
+          {/* Code Editor/Preview Content */}
+          <div className="flex-1 relative overflow-hidden">
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ${
+                activeView === 'code' ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              <CodeEditor
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabClose={handleTabClose}
+                onTabSelect={setActiveTab}
+                onContentChange={handleContentChange}
+              />
+            </div>
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ${
+                activeView === 'preview' ? 'opacity-100 z-10' : 'opacity-0 z-0'
+              }`}
+            >
+              <PreviewFrame
+                webContainer={webcontainer}
+                files={files}
+              />
+            </div>
           </div>
         </div>
       </div>

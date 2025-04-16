@@ -1,1 +1,71 @@
-export const basePrompt = `<boltArtifact id="project-import" title="Project Files"><boltAction type="file" filePath="app/global.css">@tailwind base;\n@tailwind components;\n@tailwind utilities;\n</boltAction>  <boltAction type="file" filePath="app/layout.tsx">export default function Layout({ children }: { children: React.ReactNode }) {\n  return <div className="min-h-screen bg-gray-100">{children}</div>;\n}\n</boltAction><boltAction type="file" filePath="app/page.tsx">export default function Home() {\n  return (\n    <div className="flex items-center justify-center min-h-screen">\n      <p>Welcome to Next.js with TypeScript!</p>\n    </div>\n  );\n}\n</boltAction><boltAction type="file" filePath="components.json">[]</boltAction><boltAction type="file" filePath="hooks/index.ts">export {};<boltAction type="file" filePath="lib/utils.ts">export function cn(...classes: string[]) {\n  return classes.filter(Boolean).join(" ");\n}\n</boltAction><boltAction type="file" filePath=".eslintrc.json">{\n  "extends": "next/core-web-vitals"\n}</boltAction><boltAction type="file" filePath=".gitignore">.next/\ndist/\nnode_modules/\n.env\n</boltAction><boltAction type="file" filePath="next-env.d.ts"><boltAction type="file" filePath="next.config.js">/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  reactStrictMode: true,\n  swcMinify: true\n};\nexport default nextConfig;\n</boltAction><boltAction type="file" filePath="package.json">{\n  "name": "nextjs-typescript-app",\n  "private": true,\n  "version": "0.0.1",\n  "scripts": {\n    "dev": "next dev",\n    "build": "next build",\n    "start": "next start",\n    "lint": "next lint"\n  },\n  "dependencies": {\n    "next": "14.0.0",\n    "react": "^18.3.1",\n    "react-dom": "^18.3.1"\n  },\n  "devDependencies": {\n    "eslint": "^9.9.1",\n    "typescript": "^5.5.3",\n    "tailwindcss": "^3.3.5"\n  }\n}\n</boltAction><boltAction type="file" filePath="package-lock.json">{}</boltAction><boltAction type="file" filePath="postcss.config.js">module.exports = {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n};\n</boltAction><boltAction type="file" filePath="tailwind.config.ts">import type { Config } from 'tailwindcss';\n\nconst config: Config = {\n  content: [\n    "./app/**/*.{js,ts,jsx,tsx}",\n    "./components/**/*.{js,ts,jsx,tsx}"\n  ],\n  theme: {\n    extend: {},\n  },\n  plugins: [],\n};\n\nexport default config;\n</boltAction><boltAction type="file" filePath="tsconfig.json">{\n  "compilerOptions": {\n    "target": "ES2020",\n    "lib": ["ES2020", "DOM", "DOM.Iterable"],\n    "module": "ESNext",\n    "moduleResolution": "bundler",\n    "strict": true,\n    "jsx": "preserve",\n    "noEmit": true,\n    "skipLibCheck": true,\n    "isolatedModules": true\n  },\n  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],\n  "exclude": ["node_modules"]\n}\n</boltAction></boltArtifact>`
+export const basePrompt = `<boltArtifact id="project-import" title="Project Files">
+<boltAction type="file" filePath="pages/index.tsx">export default function Home() {\n  return (\n    <div className="flex items-center justify-center min-h-screen">\n      <p>Welcome to Next.js 12 with TypeScript!</p>\n    </div>\n  );\n}\n</boltAction>
+<boltAction type="file" filePath="pages/_app.tsx">import '../styles/globals.css';\nimport type { AppProps } from 'next/app';\n\nexport default function MyApp({ Component, pageProps }: AppProps) {\n  return <Component {...pageProps} />;\n}\n</boltAction>
+<boltAction type="file" filePath="styles/globals.css">@tailwind base;\n@tailwind components;\n@tailwind utilities;\n</boltAction>
+<boltAction type="file" filePath="components.json">[]</boltAction>
+<boltAction type="file" filePath="hooks/index.ts">export {};</boltAction>
+<boltAction type="file" filePath="lib/utils.ts">export function cn(...classes: string[]) {\n  return classes.filter(Boolean).join(" ");\n}\n</boltAction>
+<boltAction type="file" filePath=".eslintrc.json">{
+  "extends": "next/core-web-vitals"
+}</boltAction>
+<boltAction type="file" filePath=".gitignore">.next/\ndist/\nnode_modules/\n.env\n</boltAction>
+<boltAction type="file" filePath="next-env.d.ts"></boltAction>
+<boltAction type="file" filePath="next.config.js">/** @type {import('next').NextConfig} */\nconst nextConfig = {\n  output: 'export',\n  eslint: {\n    ignoreDuringBuilds: true,\n  },  images: { unoptimized: true },\n};\nmodule.exports = nextConfig;\n</boltAction>
+<boltAction type="file" filePath="package.json">{
+  "name": "nextjs12-typescript-app",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "12.3.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "typescript": "^5.2.2",
+    "tailwindcss": "^3.3.5",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.24"
+  }
+}</boltAction>
+<boltAction type="file" filePath="package-lock.json">{}</boltAction>
+<boltAction type="file" filePath="postcss.config.js">module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};</boltAction>
+<boltAction type="file" filePath="tailwind.config.ts">import type { Config } from 'tailwindcss';\n
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+export default config;\n</boltAction>
+<boltAction type="file" filePath="tsconfig.json">{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "jsx": "preserve",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "isolatedModules": true
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}</boltAction>
+</boltArtifact>`;
