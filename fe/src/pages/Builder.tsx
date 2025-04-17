@@ -542,17 +542,17 @@ export const Builder: React.FC = () => {
                         type="text"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        placeholder="Ask about the project..."
-                        className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
+                        placeholder="Customize your project..."
+                        className="flex-1 px-3 py-2 bg-gray-900 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm"
                         disabled={isGenerating}
                       />
                       <Button
                         type="submit"
-                        className="p-2"
+                        className="p-2 text-white"
                         disabled={isGenerating || !prompt.trim()}
                       >
                         {isGenerating ? (
-                          <Loader className="w-4 h-4 animate-spin" />
+                          <Loader className="w-4 h-4 animate-spin text-white" />
                         ) : (
                           <ChevronRight className="w-4 h-4" />
                         )}

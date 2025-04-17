@@ -18,10 +18,9 @@ function App() {
   return (
     <BrowserRouter>
       <AppBar user={user} setUser={setUser} />
-
       <Routes>
         <Route path="/" element={<Home user={user} />} />
-        <Route path="/builder" element={<Builder />} />
+        <Route path="/builder" element={<Builder/>} />
       </Routes>
     </BrowserRouter>
   );

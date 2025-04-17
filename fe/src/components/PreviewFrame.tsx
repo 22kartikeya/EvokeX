@@ -52,7 +52,7 @@ export function PreviewFrame({ webContainer }: PreviewFrameProps) {
       });
     } catch (err: any) {
       console.error('Boot error:', err);
-      setError('Failed to start dev server');
+      setError('Start the dev server');
       setLoading(false);
       bootingRef.current = false;
     }
@@ -89,7 +89,7 @@ export function PreviewFrame({ webContainer }: PreviewFrameProps) {
                   onClick={() => bootAndRunDevServer()}
                   className="mt-2 text-blue-600 underline"
                 >
-                  Retry
+                 Start
                 </button>
               </div>
             ) : (
